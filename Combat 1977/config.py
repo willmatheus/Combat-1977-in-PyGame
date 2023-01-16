@@ -26,7 +26,7 @@ RECT_9 = (20, 168)
 RECT_10 = (168, 10)
 
 # Screen refresh
-fps = 40
+fps = 60
 
 # Wall group
 walls = pygame.sprite.Group()
@@ -40,3 +40,7 @@ clk = pygame.time.Clock()
 # Tanks
 tank_1 = pygame.image.load("Sprites/Tank_1.png")
 tank_2 = pygame.image.load("Sprites/Tank_2.png")
+rot_speed = 0.4
+ball_speed = 5
+shot_time = 10
+defeat_time = 5

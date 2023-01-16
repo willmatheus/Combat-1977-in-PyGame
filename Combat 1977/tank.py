@@ -4,8 +4,6 @@ import random
 screen = pygame.display.set_mode((800, 550))
 pygame.display.set_caption("Combat")
 
-coord = [[400, 275], [40, 120], [730, 120], [730, 400]]
-
 
 class Tank(pygame.sprite.Sprite):
     def __init__(self, tank, pos_x, pos_y, current_sprite):
@@ -51,13 +49,12 @@ class Tank(pygame.sprite.Sprite):
         self.image = self.img_tank[self.current_sprite]
         self.rect = self.image.get_rect()
         self.rect.center = (pos_x, pos_y)
-        self.rotA = False
-        self.rotD = False
+        self.rot = 0
         self.moveW = False
         self.shoot = False
-
-    def no_shoot(self):
-        self.shoot = False
+        self.hit = False
+        self.stop = False
+        self.shoot_time = 0
 
     def shoot_(self):
         self.shoot = True
@@ -68,28 +65,32 @@ class Tank(pygame.sprite.Sprite):
     def move_w(self):
         self.moveW = True
 
-    def no_rot_a(self):
-        self.rotA = False
+    def no_rot(self):
+        self.rot = 0
 
-    def rot_a(self):
-        self.rotA = True
-
-    def no_rot_d(self):
-        self.rotD = False
-
-    def rot_d(self):
-        self.rotD = True
+    def rotate(self, rotation):
+        self.rot = rotation
 
     def update(self):
-        if self.rotA:
-            self.current_sprite -= 0.8
-            if self.current_sprite < 0:
-                self.current_sprite = self.cont
-        if self.rotD:
-            self.current_sprite += 0.8
-            if self.current_sprite > self.cont:
-                self.current_sprite = 0
+        if (self.stop or self.hit) and game.hit_timer <= 0:
+            self.stop = False
+            self.hit = False
+            choice = random.choice(game.coord)
+            game.coord.remove(choice)
+            self.rect.x = choice[0]
+            self.rect.y = choice[1]
+        if self.stop:
+            return
+        self.shoot_time -= 1
+        self.current_sprite -= self.rot
+        if self.current_sprite < 0:
+            self.current_sprite = self.cont
+        if self.current_sprite > self.cont:
+            self.current_sprite = 0
         self.image = self.img_tank[int(self.current_sprite)]
+        if self.hit:
+            self.current_sprite -= 0.8
+            return
         if self.moveW:
             if self.image == self.img_tank[0]:
                 self.rect.x += 2
@@ -135,7 +136,9 @@ class Tank(pygame.sprite.Sprite):
             if self.image == self.img_tank[15]:
                 self.rect.x += 2
                 self.rect.y -= 1
-        if self.shoot:
+        if self.shoot and self.shoot_time <= 0 and len(self.ball_list) <= 2:
+            self.shoot = False
+            self.shoot_time = shot_time
             if self.image == self.img_tank[0]:
                 ball1 = Ball(self.rect.x+20, self.rect.y+7, 4, 0)
                 self.ball_list.append(ball1)
@@ -219,23 +222,17 @@ class Tank(pygame.sprite.Sprite):
 
 # ball collision with tank
 def ball_collision(tank_one, tank_two):
+    if tank_two.stop:
+        return
     for ball in tank_two.ball_list:
         if pygame.sprite.collide_mask(ball, tank_one):
             tank_two.ball_list.remove(ball)
             game.ball_sprites.remove(ball)
-            choice = random.choice(coord)
-            tank_one.rect.x = choice[0]
-            tank_one.rect.y = choice[1]
+            game.hit_timer = defeat_time
+            game.coord = [[400, 275], [40, 120], [730, 120], [730, 400]]
+            tank_one.hit = True
+            tank_two.stop = True
             tank_two.score += 1
-
-    for ball in tank_one.ball_list:
-        if pygame.sprite.collide_mask(ball, tank_two):
-            tank_one.ball_list.remove(ball)
-            game.ball_sprites.remove(ball)
-            tank_one.score += 1
-            choice = random.choice(coord)
-            tank_two.rect.x = choice[0]
-            tank_two.rect.y = choice[1]
 
 
 # tank wall collision
