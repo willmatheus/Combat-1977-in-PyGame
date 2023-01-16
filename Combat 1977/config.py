@@ -1,31 +1,42 @@
 import pygame
-from math import *
-from pygame.locals import *
-from sys import exit
 
+pygame.font.init()
 
-# class tank
-class Tank(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.sprites = []
-        self.sprites.append(pygame.image.load('Assets/tank 1.png'))
-        self.current = 0
-        self.image = self.sprites[self.current]
-        self.image = pygame.transform.scale(self.image, (32*4, 4*32))
-        self.rect = self.image.get_rect()
-        self.rect.topleft = 500, 100
+# Screen
+screen_width = 800
+screen_height = 550
 
-    def move(self):
-        if pygame.key.get_pressed()[K_a]:
-            self.rect.x -= 5
-        if pygame.key.get_pressed()[K_d]:
-            self.rect.x += 5
-        if pygame.key.get_pressed()[K_w]:
-            self.rect.y -= 5
-        if pygame.key.get_pressed()[K_s]:
-            self.rect.y += 5
-        if pygame.key.get_pressed()[K_d] and pygame.key.get_pressed()[K_w]:
-            self.rect.move_ip(self.rect, )
+# Colors
+RED = (134, 28, 9)
+YELLOW = (212, 169, 65)
+WHITE = (255, 255, 255)
+GREEN = (0, 127, 33)
+BLUE = (0, 97, 148)
 
+# Rectangles constants
+RECT_1 = (20, 20)
+RECT_2 = (60, 20)
+RECT_3 = (20, 60)
+RECT_4 = (30, 30)
+RECT_5 = (20, 108)
+RECT_6 = (108, 10)
+RECT_7 = (60, 30)
+RECT_8 = (30, 60)
+RECT_9 = (20, 168)
+RECT_10 = (168, 10)
 
+# Screen refresh
+fps = 40
+
+# Wall group
+walls = pygame.sprite.Group()
+ball_sprites = pygame.sprite.Group()
+
+TAM_TANK = 32
+
+# Clock
+clk = pygame.time.Clock()
+
+# Tanks
+tank_1 = pygame.image.load("Sprites/Tank_1.png")
+tank_2 = pygame.image.load("Sprites/Tank_2.png")
